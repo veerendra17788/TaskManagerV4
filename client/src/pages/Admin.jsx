@@ -46,7 +46,7 @@ const Admin = () => {
   useEffect(() => {
   const fetchMembers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/admin/users');
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/admin/users`);
       const arr={};
       for (let index = 0; index < res.data.length; index++) {
          arr[res.data[index].id] = res.data[index].name;
@@ -71,7 +71,7 @@ const Admin = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/admin/users/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/admin/users/${id}`);
       
       const updatedMembers = { ...members };
       delete updatedMembers[id];
@@ -97,7 +97,7 @@ const Admin = () => {
   
         // Make POST request to the API with authentication header
         const response = await axios.post(
-          'http://localhost:5000/api/tasks/tasks',
+          `${process.env.REACT_APP_API_URL}/tasks/tasks`,
           task,
           {
             headers: {
@@ -137,7 +137,7 @@ const Admin = () => {
         }
   
         try {
-          const response = await fetch('http://localhost:5000/api/tasks/tasks', {
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/tasks/tasks`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

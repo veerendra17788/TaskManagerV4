@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import axios from 'axios';  // Ensure axios is installed
 import './Member.css';
 import {
@@ -48,7 +49,7 @@ const Member = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/auth/me', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/me`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}` // Assumes token is stored in localStorage
           }
@@ -73,7 +74,7 @@ const Member = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/tasks/tasks', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/tasks/tasks`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -157,8 +158,8 @@ const Member = () => {
 
   // import axios from 'axios';
   const showAlert = (message) => {
-    alert(message + " added!..");
-    window.location.reload(); // This reloads the current page
+    alert(message + " added!.. Please Referesh to see");
+    // window.location.reload(); // This reloads the current page
   };
   
 
@@ -177,10 +178,10 @@ const Member = () => {
           console.error('Authentication token is missing.');
           return;
         }
+        
         showAlert(newTask.title);
-  
         const res = await axios.post(
-          'http://localhost:5000/api/tasks/tasks',
+          `${process.env.REACT_APP_API_URL}/tasks/tasks`,
           {
             title: task.title,
             description: task.description,
@@ -197,7 +198,7 @@ const Member = () => {
         );
   
         if (res.status === 200) {
-          console.log('Task created successfully:', res.data);
+          // console.log('Task created successfully:', res.data);
           alert('Task created successfully!');
           setTasks(prev => ({
             ...prev,
@@ -399,6 +400,25 @@ const Member = () => {
 //   setActiveId(null);
 // };
 
+const handleClearAll = async () => {
+  console.log("click");
+  try {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/tasks/clear`, {
+      method: 'DELETE',  // DELETE method to clear tasks
+    });
+    
+    if (response.ok) {
+      setTasks([]); // Update state to reflect the cleared tasks
+      alert("All tasks have been cleared!");
+    } else {
+      alert("Failed to clear tasks.");
+    }
+  } catch (error) {
+    console.error("Error clearing tasks:", error);
+    alert("Error clearing tasks. Please try again later.");
+  }
+};
+
 const handleDragEnd = async (event) => {
   
   const { active, over } = event;
@@ -433,7 +453,7 @@ const handleDragEnd = async (event) => {
   ? tasks[overContainer].findIndex(task => task.id === over.id)
   : tasks[overContainer].length;
   
-  console.log(overContainer);
+  // console.log(overContainer);
   // console.log(activeContainer);
   // If dropped in a new column (status change)
   // if (activeContainer !== overContainer) {
@@ -450,7 +470,7 @@ const handleDragEnd = async (event) => {
       
       // Make PUT request to update task status on backend
       const response = await axios.put(
-        `http://localhost:5000/api/tasks/tasks/${movedTask.id}`, 
+        `${process.env.REACT_APP_API_URL}/tasks/tasks/${movedTask.id}`, 
         {
           status: containerToStatusMap[overContainer] // Convert container name to backend status format
         },
@@ -536,6 +556,7 @@ const handleDragEnd = async (event) => {
 
   return (
     <div className="member-container">
+      
       <header className="member-header">
       <div className="member-name">
         👤 {user ? user.name : 'Loading...'}
@@ -543,7 +564,22 @@ const handleDragEnd = async (event) => {
 
         <div className="member-info">Member | 🧑‍💻</div>
       </header>
-
+      <button
+        style={{
+          margin:'10px',
+          backgroundColor: '#ff4d4d', // Red background
+          color: 'white', // White text
+          padding: '10px 20px', // Padding around the text
+          border: 'none', // No border
+          borderRadius: '5px', // Rounded corners
+          fontSize: '16px', // Font size
+          cursor: 'pointer', // Pointer cursor on hover
+          transition: 'background-color 0.3s', // Smooth transition for background color
+        }}
+        onClick={() => handleClearAll()}
+      >
+        Clear All
+      </button>
       <div className="member-content">
         {/* Create Task Section */}
         <section className="create-task-section">

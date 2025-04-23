@@ -91,6 +91,22 @@ exports.deleteTask = async (req, res) => {
   }
 };
 
+exports.deleteAllTasks = async (req, res) => {
+  try {
+    // Delete all tasks from the tasks table
+    const result = await db.query('DELETE FROM tasks');
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'No tasks found to delete' });
+    }
+
+    res.json({ message: 'All tasks deleted successfully' });
+  } catch (err) {
+    console.error('Delete all tasks error:', err);
+    res.status(500).json({ error: 'Failed to delete tasks' });
+  }
+};
+
 exports.getOverdueTasks = async (req, res) => {
   try {
     const result = await db.query(
