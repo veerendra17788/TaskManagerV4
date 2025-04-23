@@ -12,7 +12,17 @@ const adminRoutes = require('./routes/adminRoutes');
 
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+const app = express();
+app.use(cors({ 
+  origin: [
+    'http://localhost:3000',
+    'https://task-manager-v3-uetl.vercel.app',
+    'https://task-manager-v3-uetl-32oejxid5-veerendra17788s-projects.vercel.app',
+    'https://vercel.com/veerendra17788s-projects/task-manager-final/AEasWxkQ2ZHxc9F8BNmaozAzR8GL',
+    'https://task-manager-final-swart.vercel.app/'
+  ], 
+  credentials: true 
+}));
 app.use(express.json());
 app.use(cookieParser());
 
