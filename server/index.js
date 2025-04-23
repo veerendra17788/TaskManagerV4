@@ -12,7 +12,6 @@ const adminRoutes = require('./routes/adminRoutes');
 
 
 const app = express();
-const app = express();
 app.use(cors({ 
   origin: [
     'http://localhost:3000',
