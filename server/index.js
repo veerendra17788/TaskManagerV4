@@ -1,40 +1,43 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const mongoose = require('mongoose');
 require('dotenv').config();
-const db = require('./db');
 
 const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
-
-
 const app = express();
-app.use(cors({ 
-  origin: [
-    'http://localhost:3000',
-    'https://task-manager-v3-uetl.vercel.app',
-    'https://task-manager-v3-uetl-32oejxid5-veerendra17788s-projects.vercel.app',
-    'https://vercel.com/veerendra17788s-projects/task-manager-final/AEasWxkQ2ZHxc9F8BNmaozAzR8GL',
-    'https://task-manager-final-swart.vercel.app/'
-  ], 
-  credentials: true 
+
+// Middleware
+app.use(cors({
+  origin: ['http://localhost:3000',
+    'http://localhost:3001'
+  ],
+  credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());
 
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 
+// ✅ Connect to MongoDB
+mongoose.connect(process.env.DATABASE_URL)
+  .then(() => {
+    console.log('✅ Connected to MongoDB');
 
-db.query('SELECT NOW()')
-  .then(res => console.log('✅ Connected to PostgreSQL:', res.rows[0]))
-  .catch(err => console.error('❌ DB connection error:', err));
-
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
-});
+    // Start the server only after successful DB connection
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('❌ MongoDB connection error:', err.message);
+  });

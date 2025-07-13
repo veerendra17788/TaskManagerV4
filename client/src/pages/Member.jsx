@@ -130,8 +130,8 @@ const Member = () => {
       // console.log(arr); 
         setTasks(arr);
       } catch (err) {
-      } finally {
-      }
+        console.log(err);
+      } 
     };
 
     fetchTasks();
@@ -164,63 +164,61 @@ const Member = () => {
   
 
   const handleCreateTask = async () => {
-    if (newTask.title && newTask.description && newTask.dueDate && newTask.priority) {
-      try {
-        const task = { 
-          ...newTask, 
-          status: 'To Do', 
-          id: `task-${Date.now().toString()}` 
-        };
-  
-        const token = localStorage.getItem('token'); 
-  
-        if (!token) {
-          console.error('Authentication token is missing.');
-          return;
-        }
-        
-        showAlert(newTask.title);
-        const res = await axios.post(
-          `${process.env.REACT_APP_API_URL}/tasks/tasks`,
-          {
-            title: task.title,
-            description: task.description,
-            status: task.status,
-            due_date: task.dueDate,
-            priority: task.priority,
-            assignee: task.assignee,  
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-  
-        if (res.status === 200) {
-          // console.log('Task created successfully:', res.data);
-          alert('Task created successfully!');
-          setTasks(prev => ({
-            ...prev,
-            todo: [...prev.todo, res.data],
-          }));
-          
-          setNewTask({
-            title: '',
-            description: '',
-            dueDate: '',
-            assignee: '',  // <-- Reset assignee
-            priority: 'Low',
-            // assignee: 'myself'
-          });
-        }
-      } catch (err) {
-        console.error('Error creating task:', err.response ? err.response.data.error : err.message);
+  if (
+    newTask.title &&
+    newTask.description &&
+    newTask.dueDate &&
+    newTask.priority 
+  ) {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Authentication token is missing.');
+        return;
       }
-    } else {
-      console.log('Please provide all required fields: title, description, due date, priority, and assignee.');
+
+      const task = {
+        ...newTask,
+        status: 'To Do',
+      };
+
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/tasks/tasks`,
+        {
+          title: task.title,
+          description: task.description,
+          status: task.status,
+          due_date: task.dueDate,
+          priority: task.priority,
+          assignee: task.assignee,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.status === 200 || res.status === 201) {
+        alert('Task created successfully!');
+        
+        // 🟢 FORCE FULL PAGE RELOAD (safe way)
+        window.location.href = window.location.href;
+
+        // OR, optionally:
+        // window.location.reload(true); // true = reload from server (legacy support)
+      }
+    } catch (err) {
+      console.error(
+        'Error creating task:',
+        err.response ? err.response.data.error : err.message
+      );
     }
-  };
+  } else {
+    alert('Please fill all fields: title, description, due date, priority, and assignee.');
+  }
+};
+
   
   
   const findContainer = (id) => {
@@ -403,12 +401,16 @@ const Member = () => {
 const handleClearAll = async () => {
   console.log("click");
   try {
+    const token = localStorage.getItem('token'); // Get the stored token
     const response = await fetch(`${process.env.REACT_APP_API_URL}/tasks/clear`, {
-      method: 'DELETE',  // DELETE method to clear tasks
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     });
-    
     if (response.ok) {
-      setTasks([]); // Update state to reflect the cleared tasks
+      setTasks(initialTasks); // Update state to reflect the cleared tasks
       alert("All tasks have been cleared!");
     } else {
       alert("Failed to clear tasks.");

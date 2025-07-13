@@ -1,26 +1,35 @@
-const pool = require('../db'); 
+// 
 
+const User = require('../models/User');
+
+// GET /api/users
 const getAllUsers = async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT id, name, email, role FROM users'
-    );
+    const users = await User.find({}, 'name email role');
+    
+    const formattedUsers = users.map(user => ({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    }));
 
-    // Since result.rows is already an array of users, directly send it in the response
-    res.json(result.rows); 
+    res.status(200).json(formattedUsers);
   } catch (err) {
-    console.error('Error fetching users:', err);
+    console.error('Error fetching users:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
+
+// DELETE /api/users/:userId
 const deleteUser = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const result = await pool.query('DELETE FROM users WHERE id = $1', [userId]);
+    const result = await User.findByIdAndDelete(userId);
 
-    if (result.rowCount === 0) {
+    if (!result) {
       return res.status(404).json({ error: 'User not found' });
     }
 

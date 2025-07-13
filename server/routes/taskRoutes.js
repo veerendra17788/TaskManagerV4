@@ -8,6 +8,6 @@ router.get('/tasks', authenticate, taskController.getAllTasks);
 router.put('/tasks/:id', authenticate, taskController.updateTask);
 router.delete('/tasks/:id', authenticate, taskController.deleteTask);
 router.get('/tasks/overdue', authenticate, taskController.getOverdueTasks);
-router.delete('/tasks/clear', authenticate, taskController.deleteAllTasks);
+router.delete('/clear', authenticate, taskController.deleteAllTasks);
 
 module.exports = router;

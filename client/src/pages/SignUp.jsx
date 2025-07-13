@@ -17,36 +17,69 @@ const Signup = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // const handleSignup = async (e) => {
+  //   e.preventDefault();
+  
+  //   if (formData.password !== formData.confirmpassword) {
+  //     alert("Passwords do not match!");
+  //     return;
+  //   }
+  
+  //   try {
+  //     const res = await axios.post(
+  //      `${process.env.REACT_APP_API_URL}/auth/signup`,
+  //       {
+  //         name: formData.name,
+  //         email: formData.email,
+  //         password: formData.password,
+  //         role: 'member' // default role
+  //       },
+  //       { withCredentials: true }
+  //     );
+  
+  //     console.log('Signup success:', res.data);
+  //     alert('Signup successful! Please log in.');
+  //     window.location.href = '/login';
+  
+  //   } catch (err) {
+  //     console.error('Signup error:', err.response?.data || err.message);
+  //     alert(err.response?.data?.error || 'Signup failed');
+  //   }
+  // };
   const handleSignup = async (e) => {
-    e.preventDefault();
-  
-    if (formData.password !== formData.confirmpassword) {
-      alert("Passwords do not match!");
-      return;
-    }
-  
-    try {
-      const res = await axios.post(
-       `https://taskmanager-v3.onrender.com/api/auth/signup`,
-        {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: 'member' // default role
-        },
-        { withCredentials: true }
-      );
-  
-      console.log('Signup success:', res.data);
-      alert('Signup successful! Please log in.');
-      window.location.href = '/login';
-  
-    } catch (err) {
-      console.error('Signup error:', err.response?.data || err.message);
-      alert(err.response?.data?.error || 'Signup failed');
-    }
-  };
-  
+  e.preventDefault();
+
+  if (formData.password !== formData.confirmpassword) {
+    alert("Passwords do not match!");
+    return;
+  }
+
+  // 👇 Conditional role assignment
+  const isAdmin = formData.email === 'admin@gmail.com' && formData.password === 'admin';
+  const role = isAdmin ? 'admin' : 'member';
+
+  try {
+    const res = await axios.post(
+      `${process.env.REACT_APP_API_URL}/auth/signup`,
+      {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: role
+      },
+      { withCredentials: true }
+    );
+
+    console.log('Signup success:', res.data);
+    alert('Signup successful! Please log in.');
+    window.location.href = '/login';
+
+  } catch (err) {
+    console.error('Signup error:', err.response?.data || err.message);
+    alert(err.response?.data?.error || 'Signup failed');
+  }
+};
+
   
 
   return (
